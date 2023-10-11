@@ -1,0 +1,6 @@
+flask
+pandas
+keras
+tensorflow
+numpy~=1.25.0
+six

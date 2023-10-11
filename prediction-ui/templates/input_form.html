@@ -1,5 +1,37 @@
 <html>
 <head>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+
+        form.addEventListener('submit', function(event) {
+            // Check each required input field
+            const requiredFields = form.querySelectorAll('[required]');
+            for (const field of requiredFields) {
+                if (!field.value) {
+                    alert(`Please fill in the ${field.name} field.`);
+                    event.preventDefault(); // Prevent form submission
+                    return;
+                }
+            }
+        });
+    });
+</script>
+    <style>
+    .custom-label {
+        font-weight: bold;
+        color: #007bff;
+    }
+
+    .custom-input {
+        border: 2px solid #000000;
+        border-radius: 5px;
+        padding: 5px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+</style>
+
     <title>Stroke Check Form</title>
 </head>
 <body>
@@ -7,42 +39,42 @@
 <form action="/checkstroke" method="POST">
     <h1> Please fulfill the form below</h1>
     <label for="gender">Choose your gender</label>
-    <select id="gender" name="gender">
+    <select id="gender" name="gender" class="custom-input" required>
       <option value="male">Male</option>
       <option value="female">Female</option>
-    </select>
+    </select><br>
 
     <label for="age">Age:</label>
-    <input type="number" id="age" name="age" placeholder="age"> <br>
+    <input type="number" id="age" name="age" placeholder="age" class="custom-input" required> <br>
 
     <label for="hypertension">Hypertension:</label>
-    <input type="number" id="hypertension" name="hypertension" placeholder="hypertension"> <br>
+    <input type="number" id="hypertension" name="hypertension" placeholder="hypertension" class="custom-input" required><br>
 
     <label for="everMarried">Have you ever been married ?:</label>
-    <input type="text" id="everMarried" name="everMarried" placeholder="Ever Married? "> <br>
+    <input type="text" id="everMarried" name="everMarried" placeholder="Ever Married? " class="custom-input" required> <br>
 
     <label for="heartDisease">Have you ever had heart disease? :</label>
-    <input type="text" id="heartDisease" name="heartDisease" placeholder="Heart Disease?"> <br>
+    <input type="text" id="heartDisease" name="heartDisease" placeholder="Heart Disease?" class="custom-input" required> <br>
 
     <label for="workType">What is your work type:</label>
-    <input type="text" id="workType" name="workType" placeholder="What is your work type"> <br>
+    <input type="text" id="workType" name="workType" placeholder="What is your work type" class="custom-input" required> <br>
 
     <label for="residence">Where do you resident :</label>
-    <input type="text" id="residence" name="residence" placeholder="Residence "> <br>
+    <input type="text" id="residence" name="residence" placeholder="Residence " class="custom-input" required> <br>
 
     <label for="avg_glucose">What is your average glucose level? </label>
-    <input type="float" id="avg_glucose" name="avg_glucose" placeholder="avg_glucose"> <br>
+    <input type="float" id="avg_glucose" name="avg_glucose" placeholder="avg_glucose" class="custom-input" required> <br>
 
     <label for="bmi">Body mass index:</label>
-    <input type="number" id="bmi" name="bmi" placeholder="bmi"> <br>
+    <input type="number" id="bmi" name="bmi" placeholder="bmi" class="custom-input" required> <br>
 
     <label for="smoking_status">What is your smoking status? </label>
-    <input type="number" id="smoking_status" name="smoking_status" placeholder="smoking_status"> <br>
+    <input type="number" id="smoking_status" name="smoking_status" placeholder="smoking_status" class="custom-input" required> <br>
 
-    <p align="center"><a href=another_page ><button class=grey> </button></a></p>
+
     <p><input type='submit' value='Check'/></p>
 </form>
-
+<p align="center"><a href=another_page ><button class=grey> Go to another page</button></a></p>
 </body>
 </html>
 
