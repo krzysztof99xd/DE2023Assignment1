@@ -19,15 +19,12 @@ def check_stroke():
     elif request.method == "POST":
         prediction_input = [
             {
-                "age": int(request.form.get("age")),
-                "hypertension": int(request.form.get("hypertension")),  # getting input with name = ntp in HTML form
-                "everMarried": request.form.get("everMarried"),  # getting input with name = pgc in HTML form
+                "age": request.form.get("age"),
+                "weight": request.form.get("hypertension"),
+                "hypertension": request.form.get("hypertension"),
                 "heartDisease": request.form.get("heartDisease"),
-                "workType": request.form.get("workType"),
-                "residence": request.form.get("residence"),
-                "avg_glucose": float(request.form.get("avg_glucose")),
-                "bmi": float(request.form.get("bmi")),
-                "smoking_status": int(request.form.get("smoking_status")),
+                "avg_glucose": request.form.get("avg_glucose"),
+                "bmi": request.form.get("bmi"),
             }
         ]
 
