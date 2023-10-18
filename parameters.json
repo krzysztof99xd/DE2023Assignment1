@@ -1,0 +1,7 @@
+{
+    "project_id": "your-project-id",
+    "data_bucket": "your-data-bucket",
+    "trainset_filename": "your-trainset",
+    "testset_filename": "your-testset",
+    "model_repo": "your-model-repo"
+}
