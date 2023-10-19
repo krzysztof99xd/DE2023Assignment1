@@ -1,5 +1,5 @@
 # PIPELINE DEFINITION
-# Name: stroke-predictor-training-pipeline
+# Name: stroke_predictor_training_pipeline
 # Inputs:
 #    data_bucket: str
 #    dataset_uri: str
@@ -338,7 +338,7 @@ deploymentSpec:
           \  print(f\"File {source_file_name} uploaded to {model_repo}.\")\n\n"
         image: python:3.10.7-slim
 pipelineInfo:
-  name: stroke-predictor-training-pipeline
+  name: stroke_predictor_training_pipeline
 root:
   dag:
     outputs:
