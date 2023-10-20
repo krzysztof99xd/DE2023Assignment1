@@ -1,5 +1,5 @@
 # PIPELINE DEFINITION
-# Name: stroke-predictor-training-pipeline
+# Name: stroke_predictor_training_pipeline
 # Inputs:
 #    data_bucket: str
 #    dataset_uri: str
@@ -209,7 +209,7 @@ deploymentSpec:
           \n    def threshold_check(val1, val2):\n        cond = False\n        if\
           \ val1 >= val2 :\n            cond = True\n        return cond\n\n    data\
           \ = pd.read_csv(test_set.path+\".csv\")\n\n     #Loading the saved model\
-          \ with joblib\n    m_filename = model_lr.path + \".h5\"\n    model = pickle.load(open(m_filename,\
+          \ with joblib\n    m_filename = model_lr.path + \".pkl\"\n    model = pickle.load(open(m_filename,\
           \ 'rb'))\n\n    y_test = data.drop(columns=[\"stroke\"])\n    y_target =\
           \ data['stroke']\n    y_pred = model.predict(y_test)    \n\n    y_scores\
           \ =  model.predict_proba(data.drop(columns=[\"stroke\"]))[:, 1]\n\n    fpr,\
@@ -258,8 +258,8 @@ deploymentSpec:
           \        \n    import pickle \n\n    data = pd.read_csv(features.path+\"\
           .csv\")\n    model_lr = LogisticRegression()\n    model_lr.fit(data.drop('stroke',axis=1),\
           \ data['stroke'])\n    model.metadata[\"framework\"] = \"LR\"\n    file_name\
-          \ = model.path + f\".h5\"\n    with open(file_name, 'wb') as file:  \n \
-          \       pickle.dump(model_lr, file)   \n\n"
+          \ = model.path + f\".pkl\"\n    with open(file_name, 'wb') as file:  \n\
+          \        pickle.dump(model_lr, file)   \n\n"
         image: python:3.10.7-slim
     exec-train-test-split:
       container:
@@ -333,12 +333,12 @@ deploymentSpec:
           \ storage   \n    import logging \n    import sys\n\n    logging.basicConfig(stream=sys.stdout,\
           \ level=logging.INFO)    \n\n    # upload the model to GCS\n    client =\
           \ storage.Client(project=project_id)\n    bucket = client.bucket(model_repo)\n\
-          \    blob = bucket.blob('stroke_model.h5')\n    source_file_name= model.path\
-          \ + '.h5'\n\n    blob.upload_from_filename(source_file_name)    \n\n   \
-          \ print(f\"File {source_file_name} uploaded to {model_repo}.\")\n\n"
+          \    blob = bucket.blob('model_stoke.pkl')\n    source_file_name= model.path\
+          \ + '.pkl'\n\n    blob.upload_from_filename(source_file_name)    \n\n  \
+          \  print(f\"File {source_file_name} uploaded to {model_repo}.\")\n\n"
         image: python:3.10.7-slim
 pipelineInfo:
-  name: stroke-predictor-training-pipeline
+  name: stroke_predictor_training_pipeline
 root:
   dag:
     outputs:
