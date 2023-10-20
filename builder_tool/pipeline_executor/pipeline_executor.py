@@ -9,6 +9,7 @@ import google.cloud.aiplatform as aip
 def run_pipeline_job(name, pipeline_def, pipeline_root, parameter_dict):
     # Opening JSON file
     f = open(parameter_dict)
+    logging.info(f)
     data = json.load(f)
     print(data)
     logging.info(data)
