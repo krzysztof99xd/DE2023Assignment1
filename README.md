@@ -19,5 +19,6 @@ Within this project there are multiple triggers for CI/CD pipelines. They are al
 - manual trigger for executing `pipeline_executor_tool.json`
 - manual trigger for executing `stroke_predictor_pipeline_execution_cloudbuild.json`
 
+It is important that you upload your parameters.json file into gcs storage with correct parameters to run your pipeline
 
 Edit to trigger CI/CD pipeline (CI/CD testing)
