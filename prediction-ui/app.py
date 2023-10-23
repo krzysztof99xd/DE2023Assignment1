@@ -25,24 +25,18 @@ def check_stroke():
         bmi = request.form.get("bmi")
         gender_1 = True if request.form.get("gender") == 'male' else False
         ever_married_1 = True if request.form.get("married") == 'on' else False
-        work_type_Never_worked = True if request.form.get("work_type") == 'Never_worked' else False
-        work_type_Private = True if request.form.get("work_type") == 'Private' else False
-        work_type_Self_employed = True if request.form.get("work_type") == 'Self-employment' else False
+        work_type_never_worked = True if request.form.get("work_type") == 'Never_worked' else False
+        work_type_private = True if request.form.get("work_type") == 'Private' else False
+        work_type_self_employed = True if request.form.get("work_type") == 'Self-employment' else False
         work_type_children = True if request.form.get("work_type") == 'children' else False
-        Residence_type_1 = True if request.form.get("Residence_type") == 'Urban' else False
+        residence_type_1 = True if request.form.get("Residence_type") == 'Urban' else False
         smoking_status_never_smoked = True if request.form.get("smokes") != 'on' else False
         smoking_status_smokes = True if request.form.get("smokes") == 'on' else False
 
         prediction_input = [[age, hypertension, heart_disease, avg_glucose_level,
-                             bmi, gender_1, ever_married_1, work_type_Never_worked,
-                             work_type_Private, work_type_Self_employed, work_type_children,
-                             Residence_type_1, smoking_status_never_smoked, smoking_status_smokes]]
-
-        scaler = joblib.load('scaler.pkl')
-        pred_scaled = scaler.transform(new_obs) #prediction input scaled
-
-        ###Example of how pred_scaled should be used for the best model, in this case RF###
-        #y_pred_rf = best_rf_classifier.predict(pred_scaled)
+                             bmi, gender_1, ever_married_1, work_type_never_worked,
+                             work_type_private, work_type_self_employed, work_type_children,
+                             residence_type_1, smoking_status_never_smoked, smoking_status_smokes]]
 
 
         logging.debug("Prediction input : %s", prediction_input)
@@ -65,9 +59,9 @@ def check_stroke():
     # '/checkstroke' path
 
 
-@app.route('/another_page')
+@app.route('/info_page_stroke')
 def another_page():
-    return render_template('another_page.html')
+    return render_template('info_page_stroke.html')
 
 
 # The code within this conditional block will only run the python file is executed as a
