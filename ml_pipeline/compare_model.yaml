@@ -1,0 +1,90 @@
+# PIPELINE DEFINITION
+# Name: compare-model
+# Inputs:
+#    knn_metrics: dict
+#    lr_metrics: dict
+# Outputs:
+#    Output: str
+components:
+  comp-compare-model:
+    executorLabel: exec-compare-model
+    inputDefinitions:
+      parameters:
+        knn_metrics:
+          parameterType: STRUCT
+        lr_metrics:
+          parameterType: STRUCT
+    outputDefinitions:
+      parameters:
+        Output:
+          parameterType: STRING
+deploymentSpec:
+  executors:
+    exec-compare-model:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - compare_model
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.3.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"' && \"\
+          $0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef compare_model(knn_metrics: dict, lr_metrics: dict) -> str:\n\
+          \    import logging\n    import json\n    import sys\n    logging.basicConfig(stream=sys.stdout,\
+          \ level=logging.INFO)\n    logging.info(knn_metrics)\n    logging.info(lr_metrics)\n\
+          \    if knn_metrics.get(\"accuracy\") > lr_metrics.get(\"accuracy\"):\n\
+          \        return \"KNN\"\n    else :\n        return \"LR\"\n\n"
+        image: python:3.10.7-slim
+pipelineInfo:
+  name: compare-model
+root:
+  dag:
+    outputs:
+      parameters:
+        Output:
+          valueFromParameter:
+            outputParameterKey: Output
+            producerSubtask: compare-model
+    tasks:
+      compare-model:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-compare-model
+        inputs:
+          parameters:
+            knn_metrics:
+              componentInputParameter: knn_metrics
+            lr_metrics:
+              componentInputParameter: lr_metrics
+        taskInfo:
+          name: compare-model
+  inputDefinitions:
+    parameters:
+      knn_metrics:
+        parameterType: STRUCT
+      lr_metrics:
+        parameterType: STRUCT
+  outputDefinitions:
+    parameters:
+      Output:
+        parameterType: STRING
+schemaVersion: 2.1.0
+sdkVersion: kfp-2.3.0
