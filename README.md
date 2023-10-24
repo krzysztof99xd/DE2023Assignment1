@@ -17,7 +17,7 @@ Inside `builder_tool` folder there are multiple files which are responsible for 
 - `pipeline_executor_tool_cloudbuild.json` allows us to build and execute ML pipelines
 - `stroke_predictor_pipeline_execution_cloudbuild.json` is responsible for building and executing `stroke_predictor_pipeline` (`train_pipeline.ipynb`)
 
-Inside `assignment_repo` folder there are files which were used to write a report for that assignment.
+Inside `assignment_report` folder there are files which were used to write a report for that assignment.
 
 Within this project there are multiple triggers for CI/CD pipelines. They are all executed using Google Cloud Build services:
 - automatic execution of `cloud_build_ml_app.json` whenever something is pushed to MASTER branch
