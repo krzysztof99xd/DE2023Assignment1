@@ -8,10 +8,67 @@
 #    project_id: str
 #    thresholds_dict_str: str
 # Outputs:
+#    knn-model-evaluation-kpi: system.Metrics
+#    knn-model-evaluation-metrics: system.ClassificationMetrics
 #    lr-model-evaluation-kpi: system.Metrics
 #    lr-model-evaluation-metrics: system.ClassificationMetrics
 components:
+  comp-compare-model:
+    executorLabel: exec-compare-model
+    inputDefinitions:
+      artifacts:
+        knn_metrics:
+          artifactType:
+            schemaTitle: system.Metrics
+            schemaVersion: 0.0.1
+        lr_metrics:
+          artifactType:
+            schemaTitle: system.Metrics
+            schemaVersion: 0.0.1
+    outputDefinitions:
+      parameters:
+        Output:
+          parameterType: STRING
   comp-condition-1:
+    dag:
+      tasks:
+        condition-2:
+          componentRef:
+            name: comp-condition-2
+          inputs:
+            artifacts:
+              pipelinechannel--train-lr-model:
+                componentInputArtifact: pipelinechannel--train-lr-model
+            parameters:
+              pipelinechannel--compare-model-Output:
+                componentInputParameter: pipelinechannel--compare-model-Output
+              pipelinechannel--knn-model-evaluation-approval:
+                componentInputParameter: pipelinechannel--knn-model-evaluation-approval
+              pipelinechannel--model_repo:
+                componentInputParameter: pipelinechannel--model_repo
+              pipelinechannel--project_id:
+                componentInputParameter: pipelinechannel--project_id
+          taskInfo:
+            name: approve-model KNN
+          triggerPolicy:
+            condition: inputs.parameter_values['pipelinechannel--knn-model-evaluation-approval']
+              == true
+    inputDefinitions:
+      artifacts:
+        pipelinechannel--train-lr-model:
+          artifactType:
+            schemaTitle: system.Model
+            schemaVersion: 0.0.1
+      parameters:
+        pipelinechannel--compare-model-Output:
+          parameterType: STRING
+        pipelinechannel--knn-model-evaluation-approval:
+          parameterType: BOOLEAN
+        pipelinechannel--model_repo:
+          parameterType: STRING
+        pipelinechannel--project_id:
+          parameterType: STRING
+  comp-condition-2:
     dag:
       tasks:
         importer-2:
@@ -51,6 +108,95 @@ components:
             schemaTitle: system.Model
             schemaVersion: 0.0.1
       parameters:
+        pipelinechannel--compare-model-Output:
+          parameterType: STRING
+        pipelinechannel--knn-model-evaluation-approval:
+          parameterType: BOOLEAN
+        pipelinechannel--model_repo:
+          parameterType: STRING
+        pipelinechannel--project_id:
+          parameterType: STRING
+  comp-condition-3:
+    dag:
+      tasks:
+        condition-4:
+          componentRef:
+            name: comp-condition-4
+          inputs:
+            artifacts:
+              pipelinechannel--train-lr-model:
+                componentInputArtifact: pipelinechannel--train-lr-model
+            parameters:
+              pipelinechannel--compare-model-Output:
+                componentInputParameter: pipelinechannel--compare-model-Output
+              pipelinechannel--lr-model-evaluation-approval:
+                componentInputParameter: pipelinechannel--lr-model-evaluation-approval
+              pipelinechannel--model_repo:
+                componentInputParameter: pipelinechannel--model_repo
+              pipelinechannel--project_id:
+                componentInputParameter: pipelinechannel--project_id
+          taskInfo:
+            name: approve-model LR
+          triggerPolicy:
+            condition: inputs.parameter_values['pipelinechannel--lr-model-evaluation-approval']
+              == true
+    inputDefinitions:
+      artifacts:
+        pipelinechannel--train-lr-model:
+          artifactType:
+            schemaTitle: system.Model
+            schemaVersion: 0.0.1
+      parameters:
+        pipelinechannel--compare-model-Output:
+          parameterType: STRING
+        pipelinechannel--lr-model-evaluation-approval:
+          parameterType: BOOLEAN
+        pipelinechannel--model_repo:
+          parameterType: STRING
+        pipelinechannel--project_id:
+          parameterType: STRING
+  comp-condition-4:
+    dag:
+      tasks:
+        importer-3:
+          cachingOptions:
+            enableCache: true
+          componentRef:
+            name: comp-importer-3
+          dependentTasks:
+          - upload-model-to-gcs-2
+          inputs:
+            parameters:
+              uri:
+                runtimeValue:
+                  constant: gs://models_de2023_2124849
+          taskInfo:
+            name: importer-3
+        upload-model-to-gcs-2:
+          cachingOptions:
+            enableCache: true
+          componentRef:
+            name: comp-upload-model-to-gcs-2
+          inputs:
+            artifacts:
+              model:
+                componentInputArtifact: pipelinechannel--train-lr-model
+            parameters:
+              model_repo:
+                componentInputParameter: pipelinechannel--model_repo
+              project_id:
+                componentInputParameter: pipelinechannel--project_id
+          taskInfo:
+            name: upload-model-to-gcs-2
+    inputDefinitions:
+      artifacts:
+        pipelinechannel--train-lr-model:
+          artifactType:
+            schemaTitle: system.Model
+            schemaVersion: 0.0.1
+      parameters:
+        pipelinechannel--compare-model-Output:
+          parameterType: STRING
         pipelinechannel--lr-model-evaluation-approval:
           parameterType: BOOLEAN
         pipelinechannel--model_repo:
@@ -81,6 +227,46 @@ components:
           artifactType:
             schemaTitle: google.UnmanagedContainerModel
             schemaVersion: 0.0.1
+  comp-importer-3:
+    executorLabel: exec-importer-3
+    inputDefinitions:
+      parameters:
+        uri:
+          parameterType: STRING
+    outputDefinitions:
+      artifacts:
+        artifact:
+          artifactType:
+            schemaTitle: google.UnmanagedContainerModel
+            schemaVersion: 0.0.1
+  comp-knn-model-evaluation:
+    executorLabel: exec-knn-model-evaluation
+    inputDefinitions:
+      artifacts:
+        model_knn:
+          artifactType:
+            schemaTitle: system.Model
+            schemaVersion: 0.0.1
+        test_set:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+      parameters:
+        thresholds_dict_str:
+          parameterType: STRING
+    outputDefinitions:
+      artifacts:
+        kpi:
+          artifactType:
+            schemaTitle: system.Metrics
+            schemaVersion: 0.0.1
+        metrics:
+          artifactType:
+            schemaTitle: system.ClassificationMetrics
+            schemaVersion: 0.0.1
+      parameters:
+        approval:
+          parameterType: BOOLEAN
   comp-lr-model-evaluation:
     executorLabel: exec-lr-model-evaluation
     inputDefinitions:
@@ -109,6 +295,20 @@ components:
       parameters:
         approval:
           parameterType: BOOLEAN
+  comp-train-knn:
+    executorLabel: exec-train-knn
+    inputDefinitions:
+      artifacts:
+        features:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+    outputDefinitions:
+      artifacts:
+        model:
+          artifactType:
+            schemaTitle: system.Model
+            schemaVersion: 0.0.1
   comp-train-lr:
     executorLabel: exec-train-lr
     inputDefinitions:
@@ -154,8 +354,53 @@ components:
           parameterType: STRING
         project_id:
           parameterType: STRING
+  comp-upload-model-to-gcs-2:
+    executorLabel: exec-upload-model-to-gcs-2
+    inputDefinitions:
+      artifacts:
+        model:
+          artifactType:
+            schemaTitle: system.Model
+            schemaVersion: 0.0.1
+      parameters:
+        model_repo:
+          parameterType: STRING
+        project_id:
+          parameterType: STRING
 deploymentSpec:
   executors:
+    exec-compare-model:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - compare_model
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.3.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"' && \"\
+          $0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef compare_model(\n    knn_metrics: Input[Metrics],\n    lr_metrics:\
+          \ Input[Metrics],\n) -> str:\n    import logging\n    import json\n    import\
+          \ sys\n    knn_acc= knn_metrics.metadata[\"accuracy\"]\n    lr_acc= lr_metrics.metadata[\"\
+          accuracy\"]\n    if knn_acc > lr_acc:\n        return \"KNN\"\n    else\
+          \ :\n        return \"LR\"\n\n"
+        image: python:3.10.7-slim
     exec-importer:
       importer:
         artifactUri:
@@ -173,6 +418,69 @@ deploymentSpec:
         typeSchema:
           schemaTitle: google.UnmanagedContainerModel
           schemaVersion: 0.0.1
+    exec-importer-3:
+      importer:
+        artifactUri:
+          constant: gs://models_de2023_2124849
+        metadata:
+          containerSpec:
+            imageUri: us-docker.pkg.dev/vertex-ai/prediction/sklearn-cpu.1-0:latest
+        typeSchema:
+          schemaTitle: google.UnmanagedContainerModel
+          schemaVersion: 0.0.1
+    exec-knn-model-evaluation:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - knn_model_evaluation
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.3.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
+          \  python3 -m pip install --quiet --no-warn-script-location 'pandas' 'scikit-learn'\
+          \ 'numpy' && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef knn_model_evaluation(\n    test_set:  Input[Dataset],\n    model_knn:\
+          \ Input[Model],\n    thresholds_dict_str: str,\n    metrics: Output[ClassificationMetrics],\n\
+          \    kpi: Output[Metrics]\n) -> NamedTuple('outputs', approval=bool):\n\n\
+          \    import pandas as pd\n    import logging     \n    from sklearn.metrics\
+          \ import roc_curve, confusion_matrix, accuracy_score\n    import json\n\
+          \    import typing\n    import pickle\n    from numpy import nan_to_num\n\
+          \n    def threshold_check(val1, val2):\n        cond = False\n        if\
+          \ val1 >= val2 :\n            cond = True\n        return cond\n\n    data\
+          \ = pd.read_csv(test_set.path+\".csv\")\n\n     # Separate the features\
+          \ and target (in this case, \"stroke\" is the target)\n    X = data.drop('stroke',\
+          \ axis=1)\n    y = data['stroke']\n\n    #Loading the saved model with joblib\n\
+          \    m_filename = model_knn.path + \".h5\"\n    model = pickle.load(open(m_filename,\
+          \ 'rb'))\n\n    y_target = data['stroke']\n    y_pred = model.predict(X)\
+          \    \n\n    y_scores =  model.predict_proba(data.drop(columns=[\"stroke\"\
+          ]))[:, 1]\n\n    fpr, tpr, thresholds = roc_curve(\n         y_true=data['stroke'],\
+          \ y_score=y_scores, pos_label=True\n    )\n\n    thresholds = nan_to_num(thresholds)\
+          \   \n    metrics.log_roc_curve(fpr, tpr, thresholds)  \n\n    metrics.log_confusion_matrix(\n\
+          \        ['Negative', 'Positive'],\n         confusion_matrix(\n       \
+          \    data['stroke'], y_pred\n       ).tolist(), \n    )\n\n    accuracy\
+          \ = accuracy_score(data['stroke'], y_pred.round())\n    thresholds_dict\
+          \  = json.loads(thresholds_dict_str)\n    model_knn.metadata[\"accuracy\"\
+          ] = float(accuracy)\n    kpi.log_metric(\"accuracy\", float(accuracy))\n\
+          \    outputs = NamedTuple('outputs', approval=bool)\n    approval_value\
+          \ = threshold_check(float(accuracy), int(thresholds_dict['roc']))\n    return\
+          \  outputs(approval_value)\n\n"
+        image: python:3.10.7-slim
     exec-lr-model-evaluation:
       container:
         args:
@@ -208,14 +516,15 @@ deploymentSpec:
           \    import typing\n    import pickle\n    from numpy import nan_to_num\n\
           \n    def threshold_check(val1, val2):\n        cond = False\n        if\
           \ val1 >= val2 :\n            cond = True\n        return cond\n\n    data\
-          \ = pd.read_csv(test_set.path+\".csv\")\n\n     #Loading the saved model\
-          \ with joblib\n    m_filename = model_lr.path + \".h5\"\n    model = pickle.load(open(m_filename,\
-          \ 'rb'))\n\n    y_test = data.drop(columns=[\"stroke\"])\n    y_target =\
-          \ data['stroke']\n    y_pred = model.predict(y_test)    \n\n    y_scores\
-          \ =  model.predict_proba(data.drop(columns=[\"stroke\"]))[:, 1]\n\n    fpr,\
-          \ tpr, thresholds = roc_curve(\n         y_true=data['stroke'], y_score=y_scores,\
-          \ pos_label=True\n    )\n\n    thresholds = nan_to_num(thresholds)   \n\
-          \    metrics.log_roc_curve(fpr, tpr, thresholds)  \n\n    metrics.log_confusion_matrix(\n\
+          \ = pd.read_csv(test_set.path+\".csv\")\n\n    # Separate the features and\
+          \ target (in this case, \"stroke\" is the target)\n    X = data.drop('stroke',\
+          \ axis=1)\n    y = data['stroke']\n\n    #Loading the saved model with joblib\n\
+          \    m_filename = model_lr.path + \".h5\"\n    model = pickle.load(open(m_filename,\
+          \ 'rb'))\n\n    y_target = data['stroke']\n    y_pred = model.predict(X)\
+          \    \n\n    y_scores =  model.predict_proba(data.drop(columns=[\"stroke\"\
+          ]))[:, 1]\n\n    fpr, tpr, thresholds = roc_curve(\n         y_true=data['stroke'],\
+          \ y_score=y_scores, pos_label=True\n    )\n\n    thresholds = nan_to_num(thresholds)\
+          \   \n    metrics.log_roc_curve(fpr, tpr, thresholds)  \n\n    metrics.log_confusion_matrix(\n\
           \        ['Negative', 'Positive'],\n         confusion_matrix(\n       \
           \    data['stroke'], y_pred\n       ).tolist(), \n    )\n\n    accuracy\
           \ = accuracy_score(data['stroke'], y_pred.round())\n    thresholds_dict\
@@ -224,6 +533,44 @@ deploymentSpec:
           \    outputs = NamedTuple('outputs', approval=bool)\n    approval_value\
           \ = threshold_check(float(accuracy), int(thresholds_dict['roc']))\n    return\
           \ outputs(approval_value)\n\n"
+        image: python:3.10.7-slim
+    exec-train-knn:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - train_knn
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.3.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
+          \  python3 -m pip install --quiet --no-warn-script-location 'pandas' 'scikit-learn'\
+          \ && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef train_knn(features: Input[Dataset], model: Output[Model]):\n\
+          \    '''train a KNN classifier with default parameters'''\n    import pandas\
+          \ as pd\n    from sklearn.neighbors import KNeighborsClassifier\n    import\
+          \ pickle\n    import joblib\n\n    data = pd.read_csv(features.path+\".csv\"\
+          )\n\n    # Separate the features and target (in this case, \"stroke\" is\
+          \ the target)\n    X = data.drop('stroke', axis=1)\n    y = data['stroke']\n\
+          \n    model_knn = KNeighborsClassifier()\n    model_knn.fit(X, y)\n    model.metadata[\"\
+          framework\"] = \"KNN\"\n    file_name = model.path + f\".h5\"\n    with\
+          \ open(file_name, 'wb') as file:  \n        pickle.dump(model_knn, file)\
+          \  \n\n"
         image: python:3.10.7-slim
     exec-train-lr:
       container:
@@ -255,11 +602,15 @@ deploymentSpec:
           \ *\n\ndef train_lr(features: Input[Dataset], model: Output[Model]):\n \
           \   '''train a LogisticRegression with default parameters'''\n    import\
           \ pandas as pd\n    from sklearn.linear_model import LogisticRegression\
-          \        \n    import pickle \n\n    data = pd.read_csv(features.path+\"\
-          .csv\")\n    model_lr = LogisticRegression()\n    model_lr.fit(data.drop('stroke',axis=1),\
-          \ data['stroke'])\n    model.metadata[\"framework\"] = \"LR\"\n    file_name\
-          \ = model.path + f\".h5\"\n    with open(file_name, 'wb') as file:  \n \
-          \       pickle.dump(model_lr, file)   \n\n"
+          \        \n    import pickle \n    import joblib\n\n    data = pd.read_csv(features.path+\"\
+          .csv\")\n    # Separate the features and target (in this case, \"stroke\"\
+          \ is the target)\n    X = data.drop('stroke', axis=1)\n    y = data['stroke']\n\
+          \n    # Train the Logistic Regression model on the scaled data\n    model_lr\
+          \ = LogisticRegression()\n    model_lr.fit(X, y)\n    model.metadata[\"\
+          framework\"] = \"LR\"\n\n    file_name = model.path + f\".h5\"\n    with\
+          \ open(file_name, 'wb') as file:  \n        pickle.dump(model_lr, file)\
+          \   \n\n\n    # scaler_file_name = scaler.path + \".pkl\"\n    # with open(scaler_file_name,\
+          \ 'wb') as scaler_file:\n    #     pickle.dump(scaler, scaler_file)\n\n"
         image: python:3.10.7-slim
     exec-train-test-split:
       container:
@@ -337,12 +688,56 @@ deploymentSpec:
           \ + '.h5'\n\n    blob.upload_from_filename(source_file_name)    \n\n   \
           \ print(f\"File {source_file_name} uploaded to {model_repo}.\")\n\n"
         image: python:3.10.7-slim
+    exec-upload-model-to-gcs-2:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - upload_model_to_gcs
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.3.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
+          \  python3 -m pip install --quiet --no-warn-script-location 'google-cloud-storage'\
+          \ && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef upload_model_to_gcs(project_id: str, model_repo: str, model:\
+          \ Input[Model]):\n    '''upload model to gsc'''\n    from google.cloud import\
+          \ storage   \n    import logging \n    import sys\n\n    logging.basicConfig(stream=sys.stdout,\
+          \ level=logging.INFO)    \n\n    # upload the model to GCS\n    client =\
+          \ storage.Client(project=project_id)\n    bucket = client.bucket(model_repo)\n\
+          \    blob = bucket.blob('stroke_model.h5')\n    source_file_name= model.path\
+          \ + '.h5'\n\n    blob.upload_from_filename(source_file_name)    \n\n   \
+          \ print(f\"File {source_file_name} uploaded to {model_repo}.\")\n\n"
+        image: python:3.10.7-slim
 pipelineInfo:
   name: stroke-predictor-training-pipeline
 root:
   dag:
     outputs:
       artifacts:
+        knn-model-evaluation-kpi:
+          artifactSelectors:
+          - outputArtifactKey: kpi
+            producerSubtask: knn-model-evaluation
+        knn-model-evaluation-metrics:
+          artifactSelectors:
+          - outputArtifactKey: metrics
+            producerSubtask: knn-model-evaluation
         lr-model-evaluation-kpi:
           artifactSelectors:
           - outputArtifactKey: kpi
@@ -352,10 +747,62 @@ root:
           - outputArtifactKey: metrics
             producerSubtask: lr-model-evaluation
     tasks:
+      compare-model:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-compare-model
+        dependentTasks:
+        - knn-model-evaluation
+        - lr-model-evaluation
+        inputs:
+          artifacts:
+            knn_metrics:
+              taskOutputArtifact:
+                outputArtifactKey: kpi
+                producerTask: knn-model-evaluation
+            lr_metrics:
+              taskOutputArtifact:
+                outputArtifactKey: kpi
+                producerTask: lr-model-evaluation
+        taskInfo:
+          name: compare-model
       condition-1:
         componentRef:
           name: comp-condition-1
         dependentTasks:
+        - compare-model
+        - knn-model-evaluation
+        - train-lr
+        inputs:
+          artifacts:
+            pipelinechannel--train-lr-model:
+              taskOutputArtifact:
+                outputArtifactKey: model
+                producerTask: train-lr
+          parameters:
+            pipelinechannel--compare-model-Output:
+              taskOutputParameter:
+                outputParameterKey: Output
+                producerTask: compare-model
+            pipelinechannel--knn-model-evaluation-approval:
+              taskOutputParameter:
+                outputParameterKey: approval
+                producerTask: knn-model-evaluation
+            pipelinechannel--model_repo:
+              componentInputParameter: model_repo
+            pipelinechannel--project_id:
+              componentInputParameter: project_id
+        taskInfo:
+          name: condition-1
+        triggerPolicy:
+          condition: inputs.parameter_values['pipelinechannel--compare-model-Output']
+            == 'KNN'
+      condition-3:
+        componentRef:
+          name: comp-condition-3
+        dependentTasks:
+        - compare-model
         - lr-model-evaluation
         - train-lr
         inputs:
@@ -365,6 +812,10 @@ root:
                 outputArtifactKey: model
                 producerTask: train-lr
           parameters:
+            pipelinechannel--compare-model-Output:
+              taskOutputParameter:
+                outputParameterKey: Output
+                producerTask: compare-model
             pipelinechannel--lr-model-evaluation-approval:
               taskOutputParameter:
                 outputParameterKey: approval
@@ -374,10 +825,10 @@ root:
             pipelinechannel--project_id:
               componentInputParameter: project_id
         taskInfo:
-          name: approve-model
+          name: condition-3
         triggerPolicy:
-          condition: inputs.parameter_values['pipelinechannel--lr-model-evaluation-approval']
-            == true
+          condition: inputs.parameter_values['pipelinechannel--compare-model-Output']
+            == 'LR'
       importer:
         cachingOptions:
           enableCache: true
@@ -389,6 +840,29 @@ root:
               componentInputParameter: dataset_uri
         taskInfo:
           name: importer
+      knn-model-evaluation:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-knn-model-evaluation
+        dependentTasks:
+        - train-knn
+        - train-test-split
+        inputs:
+          artifacts:
+            model_knn:
+              taskOutputArtifact:
+                outputArtifactKey: model
+                producerTask: train-knn
+            test_set:
+              taskOutputArtifact:
+                outputArtifactKey: dataset_test
+                producerTask: train-test-split
+          parameters:
+            thresholds_dict_str:
+              componentInputParameter: thresholds_dict_str
+        taskInfo:
+          name: knn-model-evaluation
       lr-model-evaluation:
         cachingOptions:
           enableCache: true
@@ -412,6 +886,21 @@ root:
               componentInputParameter: thresholds_dict_str
         taskInfo:
           name: lr-model-evaluation
+      train-knn:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-train-knn
+        dependentTasks:
+        - train-test-split
+        inputs:
+          artifacts:
+            features:
+              taskOutputArtifact:
+                outputArtifactKey: dataset_train
+                producerTask: train-test-split
+        taskInfo:
+          name: train-knn
       train-lr:
         cachingOptions:
           enableCache: true
@@ -458,6 +947,14 @@ root:
         parameterType: STRING
   outputDefinitions:
     artifacts:
+      knn-model-evaluation-kpi:
+        artifactType:
+          schemaTitle: system.Metrics
+          schemaVersion: 0.0.1
+      knn-model-evaluation-metrics:
+        artifactType:
+          schemaTitle: system.ClassificationMetrics
+          schemaVersion: 0.0.1
       lr-model-evaluation-kpi:
         artifactType:
           schemaTitle: system.Metrics

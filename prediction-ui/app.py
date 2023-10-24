@@ -48,9 +48,9 @@ def check_stroke():
     # '/checkstroke' path
 
 
-@app.route('/another_page')
+@app.route('/info_page_stroke')
 def another_page():
-    return render_template('another_page.html')
+    return render_template('info_page_stroke.html')
 
 
 # The code within this conditional block will only run the python file is executed as a
