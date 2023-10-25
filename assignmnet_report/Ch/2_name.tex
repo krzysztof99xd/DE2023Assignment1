@@ -1,0 +1,35 @@
+
+
+\section{Implementation and System behaviour}
+
+
+The MLOps system has been established based on the design depicted in figure \ref{overview}, comprising three key components: an ML pipeline, a prediction/serving module, and a CI/CD pipeline.
+
+\subsection{Triggers:}
+Within this project, there are multiple triggers for CI/CD pipelines. They are all executed using Google Cloud Build services:
+
+\begin{itemize}
+  \item Automatic execution of \texttt{cloud\_build\_ml\_app.json} whenever something is pushed to the \texttt{MASTER} branch.
+  \item Manual trigger for executing \texttt{pipeline\_executor\_tool.json}.
+  \item Manual trigger for executing \texttt{stroke\_predictor\_pipeline\_execution\_cloudbuild.json}.
+\end{itemize}
+
+\subsection{MLOps Phases and Components }
+Within the ML pipeline, two distinct phases can be identified: \textbf{data preparation} and \textbf{modeling}. The data preparation phase involves several sequential steps. First, data is extracted from a Google Storage Bucket. Subsequently, the extracted data undergoes a cleaning process. Importantly, the cleaned dataset is transferred directly to the subsequent component without intermediate storage in a bucket. The cleaning component is responsible for refining the dataset. Following this, the dataset is once again directly forwarded to the subsequent component, which manages the data splitting process. This step divides the data into separate training and test sets, each of which is stored in distinct storage buckets. 
+
+
+Towards the conclusion of the ML pipeline, there is an integrated prediction/serving component. This component retrieves the model from the model repository initially utilized by the ML pipeline. Its primary function is to facilitate model accessibility for end-users. To achieve this, the component offers a user interface in the form of a Flask application [2], enabling user interactions.
+
+When a user provides input via the UI, the data is transmitted to the serving component through an API. The serving component ensures that the model generates predictions based on this input. Subsequently, the prediction results are communicated back to the UI via another API, allowing users to view the outcomes.
+
+Both components prediction-api and prediction are containerized into Dockerfiles and deployed using Cloud Run. It is a platform that enables to run containers that are invocable via requests or events. Within the scope of this project, both components are callable when there are changes to the MASTER branch within the repository.
+
+
+
+
+
+
+
+
+ 
+

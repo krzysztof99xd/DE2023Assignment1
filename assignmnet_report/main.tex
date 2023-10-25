@@ -1,0 +1,207 @@
+%5000 words
+\documentclass[10pt, letterpaper]{report}       % Set document class
+\usepackage[utf8x]{inputenc}                    % Used to encode document
+\usepackage{subfiles}                           % Allows sub files
+
+% ================================================
+%           PACKAGES
+% ================================================
+
+% === GENERAL ===
+\usepackage[english]{babel}     % Set language of document
+\usepackage{hyperref}			% Allows hyperlink references
+\usepackage[toc]{appendix}	    % Improves appendix behaviour
+\usepackage{url}				% Improves URL behaviour
+\usepackage[bottom]{footmisc}   % Set footnote style
+%\setlength\parindent{0pt}      % Set indent first line paragraph
+\usepackage{parskip}            % Creates vertical space between paragraphs
+%\usepackage{lipsum}            % Enables lipsum text fillers
+
+% === MATH ===
+\usepackage{amsmath}            % Align equations
+\usepackage{amssymb}            % Allow different math fonts
+%\usepackage{siunitx}           % Standardizes appearance of numbers and units
+
+% To prevent annoying spacing \left{(} and \right{)} https://tex.stackexchange.com/questions/2607/spacing-around-left-and-right
+%%%\let\originalleft\left
+%%%\let\originalright\right
+%%%\renewcommand{\left}{\mathopen{}\mathclose\bgroup\originalleft}
+%%%\renewcommand{\right}{\aftergroup\egroup\originalright}
+
+% === CODE ===
+\usepackage{listings}           % For advanced code
+\usepackage{minted}             % Python code
+\usepackage[T1]{fontenc}        % < and > visible in code (icm 'minted' package)
+
+% === FIGURES & TABLES ===
+\usepackage{graphicx}           % Allows use of images
+\usepackage[format=plain, labelfont={it}, textfont=it]{caption}   % Set caption style
+\usepackage{wrapfig}			% Allows wrapping of text around figures
+\usepackage{float}				% Improves image placement
+\usepackage{subfigure}          % Allows subfigures
+%\usepackage{sidecap}           % Allows Figure captions on the side
+%\usepackage{subcaption}        % Allows subcaptions within figures
+%\usepackage{lscape}            % Allows rotated tables
+\usepackage{booktabs}			% Allows professional tables
+\usepackage{tabu}				% Powerful table environment
+\usepackage{tabularx}
+\usepackage{multirow}           % Multiple rows in tables
+
+% === SYMBOLS & TEXT STYLES ===
+\usepackage{gensymb}            % Symbols degree, Celsius, etc.
+%\usepackage{soul}              % Underlining, striking out, etc.
+%\usepackage{libertine}         % Enables extra fonts
+\usepackage{comment}            % Allows to comment chunks of text
+\usepackage{epigraph}           % Allows epigraphs
+
+% === CITATIONS & BIBLIOGRAPHY ===
+%\usepackage{natbib}            % Set citation style
+\bibliographystyle{apalike}     % Set bibliography style
+
+% === SET PAGE SIZE & MARGINS ===
+% a4: 595 pt x 842 pt
+\usepackage{geometry}           % Enables to set margins
+\geometry{a4paper, top=25mm, bottom=25mm}              % Set paper size
+\voffset = 0pt                  % Set offset top
+\textheight = 650pt             % Set page-text length
+\footskip = 45pt   % Set foot distance
+
+% === SET HEADER & FOOTER ===
+\usepackage{fancyhdr}			% Enables fancy header of page
+\pagestyle{fancy}               % Set page style
+\fancyhf{}
+\lhead{}
+\rhead{}
+\lfoot{\small \color{JADSred} TUe \color{black}- Technische Universiteit Eindhoven}
+\rfoot{}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+
+% === SET CHAPTER & SECTION STYLE ===
+\usepackage{titlesec}           % Customize style chapters and sections
+\titleformat{\chapter}{\LARGE\normalfont\bfseries}{\thechapter}{1em}{}
+\titlespacing*{\chapter}{0pt}{0pt}{20pt}
+
+% === COLORS ===
+\usepackage{color}                          % Allows basic colors
+\usepackage{xcolor}                         % Allows more colors
+\definecolor{purple}{HTML}{cbcefb}          % Define own color
+\definecolor{JADSred}{HTML}{b32b0a}         % Define own color
+\definecolor{orange}{HTML}{ffce93}          % Define own color
+\definecolor{lightgray}{HTML}{d3d3d3}       % Define own color
+\definecolor{codeyellow}{HTML}{ffecb2}      % Background code
+
+
+%=================================================
+\begin{document}
+
+% ================================================
+%           TITLE PAGE
+% ================================================
+\begin{titlepage}
+
+\thispagestyle{empty}
+
+\begin{center}
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.4\textwidth]{Fig/jads_logo.png}
+	\end{figure}
+	\huge{JADS \\ JM0140-M-6 - Data Engineering\\
+	\line(1,0){300}\\[2cm]
+    \huge{\textbf{Report\\
+     \underline{\textbf{Assignment 1}}\\
+    
+    }}\\[1.5cm]
+    \huge{\textit{Group 12}}\\[1.5cm]
+\end{center}
+
+\begin{table}[H]
+\Large
+\centering
+\begin{tabular}{l l}
+
+% names here
+Krzysztof Wieśniakowski & 2124849 \\
+Kyriakos Koukiadakis & 2074817\\
+Xavier Paulus & 2047901\\
+Vishal Sehgal & 2109374 \\
+Chigozie Ifepe & 2109365\\
+
+\end{tabular}
+\end{table}
+
+\begin{center}
+\begin{Large}
+\centering
+% Supervisor1:\\
+
+% Name1\\\\
+
+% Supervisor 2::\\
+
+% Name2
+
+
+\vspace{20pt}
+\end{Large}
+\end{center}
+
+\begin{center}
+\begin{Large}
+\centering
+\today \\
+\end{Large}
+\end{center}
+
+\end{titlepage}
+
+% ================================================
+%           CHAPTERS
+% ================================================
+
+\tableofcontents
+
+\vfill
+The code is available in our repository: 
+\newline \url{https://github.com/krzysztof99xd/DE2023Assignment1} 
+
+The Jupyter notebook and the data we used are available at:
+\newline \url{https://www.kaggle.com/code/x1wello1x/prediction-of-strokes}
+
+
+\chapter{{Overview of the ML Application}}
+\label{ch:chapter1}
+\input{Ch/1_name}
+\pagebreak
+
+\chapter{Design and Implementation of the MLOps System}
+\label{ch:chapter2}
+\input{Ch/2_name}
+\pagebreak
+
+\chapter{Reflection on the Design and Implementation of the MLOps System}
+\label{ch:chapter3}
+\input{Ch/3_name}
+\pagebreak
+
+\chapter{Individual Contributions of Students}
+\label{ch:chapter4}
+\input{Ch/4_name}
+\pagebreak
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+
+\chapter{Appendix}
+\begin{wrapfigure}{o}{0.25\textwidth}
+\begin{center}
+    \caption{Overview}
+    \label{overview}
+    \includegraphics[scale=0.45]{Fig/overview.png}
+    \end{center}
+\end{wrapfigure}
+
+
+\end{document}
