@@ -1,0 +1,34 @@
+\section{ML application goals}
+
+The ML application built for this assignment is created to predict whether someone is likely to have a stroke attack or not. Every year 47,000 people suffer from a stroke in the Netherlands. Over the next ten years, we expect to see a rise in the number of people who have strokes. Strokes are the third leading cause of disease burden in the Netherlands, accounting for 2.5\% of all healthcare costs . In 2000, about half of all first-time stroke patients died within a year of being hospitalized. By 2005, this number had dropped to 22\%, thanks to early diagnosis and improved aftercare services for prone to stroke patients. So there is a need for a quick and accessible application that can predict which patients are prone to stroke and act quickly. \cite{vat2016development}
+
+The goal of this application is to support doctors and patients in the early diagnosis and prevention of chronic ailments. The dataset consists of several explanatory variables that describe what to look out for when diagnosing stroke conditions. They include:
+
+1) id: unique identifier
+2) gender: "Male", "Female" or "Other"
+3) age: age of the patient
+4) hypertension: 0 if the patient doesn't have hypertension, 1 if the patient has hypertension
+5) heart\_disease: 0 if the patient doesn't have any heart diseases, 1 if the patient has a heart disease
+6) ever\_married: "No" or "Yes"
+7) work\_type: "children", "Govt\_jov", "Never\_worked", "Private" or "Self-employed"
+8) Residence\_type: "Rural" or "Urban"
+9) avg\_glucose\_level: average glucose level in blood
+10) bmi: body mass index
+11) smoking\_status: "formerly smoked", "never smoked", "smokes" or "Unknown"*
+12) stroke: 1 if the patient had a stroke or 0 if not
+
+However, in the current implementation, the models deal only with numerical values, therefore, only the variables which represent numbers are feeded into the model. Other columns were dropped before splitting into train and test sets.
+
+
+
+
+\section{MLOps requirements of the application }
+
+
+
+Throughout the process of deploying this machine learning application, several critical considerations come into play. The foremost requirement pertains to the necessity of retraining the model. As established in the literature  \cite{talby-oreilly}, machine learning models deployed in production inevitably experience a decline in accuracy over time. To maintain the model's precision at a level commensurate with its use case, regular retraining is imperative. In this context, it is paramount to ensure that the model remains highly accurate. Failing to do so could not only lead to undue distress by misdiagnosing individuals with malignant stroke when their condition is benign, but it could also be far more detrimental, as individuals might erroneously believe they are free of serious disease when they are not.
+
+Additional essential considerations may include potential restrictions on the deployment of the model. Given that this model handles personal data, compliance with GDPR \cite{gdpr-alchemer}] is a prerequisite. The data, focusing exclusively on stroke-related information, cannot be linked to individuals. However, it does include unique ID numbers for each case or person, making it crucial to ensure complete anonymization in this regard. As long as the data remains anonymous, no further constraints should hinder model deployment.
+
+
+

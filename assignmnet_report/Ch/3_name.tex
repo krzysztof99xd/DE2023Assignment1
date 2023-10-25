@@ -1,0 +1,26 @@
+\section{Alternative designs and future improvements}
+
+
+This is a very simple application for predicting having a stroke based on the simple input form. Nevertheless, this application has already very strong basics and can be easily further developed in the future. 
+
+Firstly, using pipelines for training the model allows to create well-organized and well-structured code which can be easily reused and easily adjusted in the future. Pipelines give the opportunity to perform some of the components in parallel (for example training 2 models at the same time) which speed up the process. At the same time pipelines allow you to define steps consecutively and provide conditions whether some step should take place or not (for example defining whether the model should be deployed based on the performance).
+
+Secondly, automatic triggering for CI/CD pipeline when something is pushed to the Master branch is very beneficial. This saves a lot of time for developers since there is no need to push code to the production environment and to deploy application online manually.
+
+At the moment there is no automatic testing used for this project. Because of that, some errors may easily appear in the master branch if they are not caught in the merge requests (code reviews). Adding the automatic testing would be highly beneficial for that application.
+
+At the moment there is only one automatic trigger. To further develop and expand the application, there should be more automation introduced. Great added value would be to retrain the model whenever a new training data is uploaded to Google Cloud Storage. This can be achieved for example by implementing cloud functions. \cite{google} 
+
+Within this implementation, doctors/medical staff need to access a separate web page to enter patients’ data. Ideally this system should be integrated within the hospital system where the machine learning model could retrieve the patients’ data automatically for example whenever a new data is added and make predictions continuously. This of course would require more work in terms of security and data integration. 
+
+Models at the moment also deal only with numerical values. In the further implementations, the columns which are not represented as digits, should be decoded to numbers (probably after cleaning step and before splitting into train and test sets).
+
+
+
+\section{Implementation shortcomings}
+
+
+
+The hardest part for the team was to combine all the components of this application together. None of the members hass ever worked with Google Cloud before and did not have any experience with virtual machines as well as with containerization. Therefore, the biggest struggle was to make all of the parts of the assignment cooperate with each other. For example, the team was struggling for a long time to understand how the local model inside the project is replaced with the model from the Google Cloud Storage. Extra consultancy with the professor was needed to understand that.
+
+
